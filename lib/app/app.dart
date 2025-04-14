@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'home/home_page.dart';
+import 'home/todo_list_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -9,12 +9,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Homepage(title: 'Flutter Demo Home Page'),
+      home: const TodoListPage(),
     );
   }
 }
