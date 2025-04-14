@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lista_tarefas/models/task.dart';
+import '/widgets/todo_list_item.dart';
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
@@ -8,30 +10,35 @@ class TodoListPage extends StatefulWidget {
 }
 
 class _TodoListPageState extends State<TodoListPage> {
+  final TextEditingController taskController = TextEditingController();
+  List<Task> tasks = [];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  _buildAddTaskName(),
-                  SizedBox(
-                    width: 16,
-                  ),
-                  _buildAddTaskButton(),
-                ],
-              ),
-              SizedBox(height: 16),
-              Row(children: [
-                _buildLabelPendingTasks(),
-                _buildClearTasksButton()
-              ])
-            ],
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    _buildAddTaskName(),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    _buildAddTaskButton(),
+                  ],
+                ),
+                _buildListViewTasks(),
+                Row(children: [
+                  _buildLabelPendingTasks(),
+                  _buildClearTasksButton()
+                ])
+              ],
+            ),
           ),
         ),
       ),
@@ -41,6 +48,7 @@ class _TodoListPageState extends State<TodoListPage> {
   Widget _buildAddTaskName() {
     return Expanded(
       child: TextField(
+        controller: taskController,
         decoration: InputDecoration(
             hintText: "Inserir tarefa", border: OutlineInputBorder()),
       ),
@@ -65,7 +73,7 @@ class _TodoListPageState extends State<TodoListPage> {
 
   Widget _buildClearTasksButton() {
     return ElevatedButton(
-        onPressed: addTask,
+        onPressed: clearTasks,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.green,
           padding: EdgeInsets.all(13),
@@ -82,5 +90,30 @@ class _TodoListPageState extends State<TodoListPage> {
     return Expanded(child: Text("Você tem 0 tarefas pendentes"));
   }
 
-  void addTask() {}
+  Widget _buildListViewTasks() {
+    return Flexible(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          for (Task task in tasks) TodoListItem(task: task),
+        ],
+      ),
+    );
+  }
+
+  void addTask() {
+    setState(() {
+      DateTime now = DateTime.now();
+      Task newTask = Task(taskName: taskController.text, inclusionDate: now);
+      tasks.add(newTask);
+      taskController.clear();
+    });
+  }
+
+  void clearTasks() {
+    setState(() {
+      tasks.clear();
+      taskController.clear();
+    });
+  }
 }
