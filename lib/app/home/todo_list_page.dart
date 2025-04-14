@@ -12,12 +12,12 @@ class _TodoListPageState extends State<TodoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
                 children: [
                   _buildAddTaskName(),
                   SizedBox(
@@ -26,8 +26,13 @@ class _TodoListPageState extends State<TodoListPage> {
                   _buildAddTaskButton(),
                 ],
               ),
-            ),
-          ],
+              SizedBox(height: 16),
+              Row(children: [
+                _buildLabelPendingTasks(),
+                _buildClearTasksButton()
+              ])
+            ],
+          ),
         ),
       ),
     );
@@ -56,6 +61,25 @@ class _TodoListPageState extends State<TodoListPage> {
         color: Colors.white,
       ),
     );
+  }
+
+  Widget _buildClearTasksButton() {
+    return ElevatedButton(
+        onPressed: addTask,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          padding: EdgeInsets.all(13),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        child: Text(
+          "Limpar tarefas",
+          style: TextStyle(color: Colors.white),
+        ));
+  }
+
+  Widget _buildLabelPendingTasks() {
+    return Expanded(child: Text("Você tem 0 tarefas pendentes"));
   }
 
   void addTask() {}
