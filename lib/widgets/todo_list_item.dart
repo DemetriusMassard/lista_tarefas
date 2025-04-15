@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lista_tarefas/models/task.dart';
+import 'package:intl/intl.dart';
 
 class TodoListItem extends StatelessWidget {
   const TodoListItem({required this.task, super.key});
@@ -19,7 +20,7 @@ class TodoListItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            task.inclusionDate.toString(),
+            DateFormat(),
             style: TextStyle(
               fontSize: 12,
             ),

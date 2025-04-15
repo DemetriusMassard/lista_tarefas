@@ -32,7 +32,10 @@ class _TodoListPageState extends State<TodoListPage> {
                     _buildAddTaskButton(),
                   ],
                 ),
-                _buildListViewTasks(),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: _buildListViewTasks(),
+                ),
                 Row(children: [
                   _buildLabelPendingTasks(),
                   _buildClearTasksButton()
