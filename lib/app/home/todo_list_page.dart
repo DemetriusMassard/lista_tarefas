@@ -13,6 +13,9 @@ class _TodoListPageState extends State<TodoListPage> {
   final TextEditingController taskController = TextEditingController();
   List<Task> tasks = [];
 
+  Task? deletedTask;
+  int? deletedTaskPos;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -32,10 +35,7 @@ class _TodoListPageState extends State<TodoListPage> {
                     _buildAddTaskButton(),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: _buildListViewTasks(),
-                ),
+                _buildListViewTasks(),
                 Row(children: [
                   _buildLabelPendingTasks(),
                   _buildClearTasksButton()
@@ -90,7 +90,7 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   Widget _buildLabelPendingTasks() {
-    return Expanded(child: Text("Você tem 0 tarefas pendentes"));
+    return Expanded(child: Text("Você tem ${tasks.length} tarefas pendentes"));
   }
 
   Widget _buildListViewTasks() {
@@ -98,7 +98,7 @@ class _TodoListPageState extends State<TodoListPage> {
       child: ListView(
         shrinkWrap: true,
         children: [
-          for (Task task in tasks) TodoListItem(task: task),
+          for (Task task in tasks) TodoListItem(task: task, onDelete: onDelete),
         ],
       ),
     );
@@ -118,5 +118,31 @@ class _TodoListPageState extends State<TodoListPage> {
       tasks.clear();
       taskController.clear();
     });
+  }
+
+  void onDelete(Task task) {
+    deletedTask = task;
+    deletedTaskPos = tasks.indexOf(task);
+    setState(
+      () {
+        tasks.remove(task);
+      },
+    );
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Tarefa ${task.taskName} foi removida"),
+        action: SnackBarAction(
+          label: "Desfazer",
+          onPressed: () {
+            setState(
+              () {
+                tasks.insert(deletedTaskPos!, deletedTask!);
+              },
+            );
+          },
+        ),
+      ),
+    );
   }
 }
