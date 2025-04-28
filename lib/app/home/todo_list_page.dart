@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lista_tarefas/models/task.dart';
+import 'package:lista_tarefas/repositories/task_repository.dart';
 import '/widgets/todo_list_item.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -11,10 +12,23 @@ class TodoListPage extends StatefulWidget {
 
 class _TodoListPageState extends State<TodoListPage> {
   final TextEditingController taskController = TextEditingController();
+  final TaskRepository tasksRepository = TaskRepository();
+
   List<Task> tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    tasksRepository.loadTasks().then((value) {
+      setState(() {
+        tasks = value;
+      });
+    });
+  }
 
   Task? deletedTask;
   int? deletedTaskPos;
+  List<Task> deletedTasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +52,7 @@ class _TodoListPageState extends State<TodoListPage> {
                 _buildListViewTasks(),
                 Row(children: [
                   _buildLabelPendingTasks(),
-                  _buildClearTasksButton()
+                  _buildClearTasksButton(),
                 ])
               ],
             ),
@@ -76,7 +90,7 @@ class _TodoListPageState extends State<TodoListPage> {
 
   Widget _buildClearTasksButton() {
     return ElevatedButton(
-        onPressed: clearTasks,
+        onPressed: _dialogConfirmClearTaskList,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.green,
           padding: EdgeInsets.all(13),
@@ -105,18 +119,27 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   void addTask() {
-    setState(() {
-      DateTime now = DateTime.now();
-      Task newTask = Task(taskName: taskController.text, inclusionDate: now);
-      tasks.add(newTask);
-      taskController.clear();
-    });
+    if (taskController.text == "") {
+      //TODO: error message
+    } else {
+      setState(
+        () {
+          DateTime now = DateTime.now();
+          Task newTask =
+              Task(taskName: taskController.text, inclusionDate: now);
+          tasks.add(newTask);
+          taskController.clear();
+          tasksRepository.saveTasks(tasks);
+        },
+      );
+    }
   }
 
   void clearTasks() {
     setState(() {
       tasks.clear();
       taskController.clear();
+      tasksRepository.saveTasks(tasks);
     });
   }
 
@@ -138,10 +161,42 @@ class _TodoListPageState extends State<TodoListPage> {
             setState(
               () {
                 tasks.insert(deletedTaskPos!, deletedTask!);
+                tasksRepository.saveTasks(tasks);
               },
             );
           },
         ),
+      ),
+    );
+    tasksRepository.saveTasks(tasks);
+  }
+
+  Future<void> _dialogConfirmClearTaskList() async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Limpar lista?"),
+        content: Text("Tem certeza de que deseja limpar a lista?"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () {
+              clearTasks();
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Limpar",
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
