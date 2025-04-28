@@ -13,6 +13,7 @@ class TodoListPage extends StatefulWidget {
 class _TodoListPageState extends State<TodoListPage> {
   final TextEditingController taskController = TextEditingController();
   final TaskRepository tasksRepository = TaskRepository();
+  String? errorText;
 
   List<Task> tasks = [];
 
@@ -67,7 +68,9 @@ class _TodoListPageState extends State<TodoListPage> {
       child: TextField(
         controller: taskController,
         decoration: InputDecoration(
-            hintText: "Inserir tarefa", border: OutlineInputBorder()),
+            hintText: "Inserir tarefa",
+            border: OutlineInputBorder(),
+            errorText: errorText),
       ),
     );
   }
@@ -120,7 +123,9 @@ class _TodoListPageState extends State<TodoListPage> {
 
   void addTask() {
     if (taskController.text == "") {
-      //TODO: error message
+      setState(() {
+        errorText = "O título não pode ser vazio!";
+      });
     } else {
       setState(
         () {
@@ -130,6 +135,7 @@ class _TodoListPageState extends State<TodoListPage> {
           tasks.add(newTask);
           taskController.clear();
           tasksRepository.saveTasks(tasks);
+          errorText = null;
         },
       );
     }
